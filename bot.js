@@ -3,6 +3,7 @@ var config = require('./config');
 var Promise = require('bluebird');
 var fs = Promise.promisifyAll(require("fs"));
 var rp = require('request-promise');
+var https = require('https');
 
 // Initialize Spark API
 var spark = Spark({

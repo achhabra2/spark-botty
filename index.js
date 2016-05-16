@@ -27,7 +27,7 @@ app.post('/', function (req, res) {
 });
 
 app.listen(80, function () {
-  console.log('Example app listening on port 80!');
+  console.log('Spark Botty Up and running on port 80');
 });
 
 botty.onText(/\/echo (.+)/, (message, regArray) => {
