@@ -33,7 +33,7 @@ app.listen(process.env.PORT || 80, function () {
 
 botty.onText(/\/echo (.+)/, (message, regArray) => {
   text = "Echoing: " + regArray[1];
-  botty.sendMessage(text).then(() => {
+  botty.sendMessage(text, message.roomId).then(() => {
     console.log("Succesfully Echoed.");
   }).catch((err) => {
     console.log("Error Echoing :");
@@ -43,7 +43,7 @@ botty.onText(/\/echo (.+)/, (message, regArray) => {
 
 botty.onText(/\/call (.+)/, (message, regArray) => {
   text = "Echoing: " + regArray[1];
-  botty.sendMessage(text).then(() => {
+  botty.sendMessage(text, message.roomId).then(() => {
     console.log("Succesfully Echoed.");
   }).catch((err) => {
     console.log("Error Echoing :");
@@ -53,7 +53,7 @@ botty.onText(/\/call (.+)/, (message, regArray) => {
 botty.onText(/\/text\s(\+1\d{10})\s(.+)/, (message, regArray) => {
   botty.sendSMS(regArray[1], regArray[2]).then((status) => {
     console.log(status);
-  }).then(botty.sendMessage("SMS Sent Successfully"))
+  }).then(botty.sendMessage("SMS Sent Successfully"), message.roomId)
     .then((success) => {
       console.log(success);
     })

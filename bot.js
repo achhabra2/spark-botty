@@ -85,8 +85,8 @@ var Botty = function (params) {
         .then( (body) => {
           _respondTo(body,responseArray);
         })
-        .then((messageText) => {
-          resolve(messageText)
+        .then((message) => {
+          resolve(message)
         })
         .catch((err) => {
           reject(err);
@@ -94,9 +94,10 @@ var Botty = function (params) {
     });
   };
 
-  var _respondTo = (message, responseArray) => {
+  var _respondTo = (body, responseArray) => {
     //Process Message via RegEx
-    var messageText = JSON.parse(message).text;
+    var message = JSON.parse(body);
+    var messageText = message.text;
     var result = null;
     return new Promise(function(resolve,reject) {
       responseArray.forEach((reg) => {
@@ -104,18 +105,18 @@ var Botty = function (params) {
          result = reg.regexp.exec(messageText);
          if (result) {
            // debug('Matches', reg.regexp);
-           reg.callback(messageText, result);
-           resolve(messageText);
+           reg.callback(message, result);
+           resolve(message);
          }
          else reject("No Matching response type found.");
        });
     });
   };
 
-  Botty.prototype.sendMessage = (text) => {
+  Botty.prototype.sendMessage = (text, roomId) => {
     return new Promise(function(resolve,reject) {
       spark.sendMessage({
-        roomId:config.monitorRoom,
+        roomId: roomId,
         text: text,
         }).then((res) => {
           console.log("Successfully sent message: " + text);
