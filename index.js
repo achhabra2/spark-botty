@@ -2,16 +2,20 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var bot = require('./bot');
 
-var app = express();
+//Initialize bot class
 var botty = new bot();
 botty.init();
 
+//Initialize Express Web Server
+var app = express();
 app.use(bodyParser.json());
 
+//Define a handler for HTTP Get on /
 app.get('/', function (req, res) {
   res.send('Hello World!');
 });
 
+//Define a handler for HTTP POST on /
 app.post('/', function (req, res) {
   res.send('Thanks');
   console.log("Received Message From: " + req.body.data.personEmail);
@@ -27,10 +31,13 @@ app.post('/', function (req, res) {
     });
 });
 
+// Start listening on port 80 or the port defined in environment variables
 app.listen(process.env.PORT || 80, function () {
   console.log('Spark Botty Up and running on port 80');
 });
 
+
+// Define BOT handler method for /echo *text*
 botty.onText(/\/echo (.+)/, (message, regArray) => {
   text = "Echoing: " + regArray[1];
   botty.sendMessage(text, message.roomId).then(() => {
@@ -41,6 +48,7 @@ botty.onText(/\/echo (.+)/, (message, regArray) => {
   });
 });
 
+// Define BOT Handler method for /call *text*
 botty.onText(/\/call (.+)/, (message, regArray) => {
   text = "Echoing: " + regArray[1];
   botty.sendMessage(text, message.roomId).then(() => {
@@ -50,6 +58,7 @@ botty.onText(/\/call (.+)/, (message, regArray) => {
   });
 });
 
+// Define BOT Handler method for /text *text*
 botty.onText(/\/text\s(\+1\d{10})\s(.+)/, (message, regArray) => {
   botty.sendSMS(regArray[1], regArray[2]).then((status) => {
     console.log(status);

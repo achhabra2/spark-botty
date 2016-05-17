@@ -11,8 +11,10 @@ var spark = Spark({
   token: config.token
 });
 
+// Configure bearer token from environment variables
 var token = "Bearer " + config.token;
 
+// This is used for listing existing webhooks to construct HTTPS POST req
 var webhookOptions = {
     uri: 'https://api.ciscospark.com/v1/webhooks',
     headers: {
@@ -22,6 +24,7 @@ var webhookOptions = {
     json: true // Automatically parses the JSON string in the response
 };
 
+// This is used for listing rooms as a HTTPS POST req
 var roomOptions = {
     uri: 'https://api.ciscospark.com/v1/rooms',
     headers: {
@@ -31,6 +34,7 @@ var roomOptions = {
     json: true // Automatically parses the JSON string in the response
 };
 
+// Match existing webhooks with existing room memberships
 var _matchExisting = (rooms, webhooks) => {
   var newWebhooks = [];
   for(i=0; i<rooms.length; i++) {
@@ -57,6 +61,7 @@ var _matchExisting = (rooms, webhooks) => {
   });
 };
 
+// Method: get existing rooms and webhooks and return the combined response
 var _queryExisting = () => {
   return new Promise(function(resolve, reject) {
     var p1 = rp(roomOptions);
@@ -142,10 +147,7 @@ var Botty = function (params) {
         headers: { accept: '*/*' }
       };
 
-      options.path += '&to=';
-      options.path += number;
-      options.path += '&msg=';
-      options.path += message;
+      options.path = '&to=' + number + '&msg=' + message;
       options.path = encodeURI(options.path);
 
       var req = https.request(options, function(res) {
@@ -164,6 +166,8 @@ var Botty = function (params) {
 
   };
 
+// Initialize the bot by checking existing rooms against webhooks
+// If the webhooks are not found they get added so the bot will monitor
   Botty.prototype.init = () => {
     _queryExisting()
       .then((arrays) => {
