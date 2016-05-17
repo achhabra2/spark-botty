@@ -22,7 +22,8 @@ app.post('/', function (req, res) {
       console.log("Succesfully processed message");
     })
     .catch((err) => {
-      console.log(err);
+      console.log("Error processing message:");
+      console.error(err);
     });
 });
 
@@ -35,7 +36,8 @@ botty.onText(/\/echo (.+)/, (message, regArray) => {
   botty.sendMessage(text).then(() => {
     console.log("Succesfully Echoed.");
   }).catch((err) => {
-    console.log("Error Echoing.");
+    console.log("Error Echoing :");
+    console.error(err);
   });
 });
 
@@ -44,7 +46,7 @@ botty.onText(/\/call (.+)/, (message, regArray) => {
   botty.sendMessage(text).then(() => {
     console.log("Succesfully Echoed.");
   }).catch((err) => {
-    console.log("Error Echoing.");
+    console.log("Error Echoing :");
   });
 });
 
@@ -56,6 +58,7 @@ botty.onText(/\/text\s(\+1\d{10})\s(.+)/, (message, regArray) => {
       console.log(success);
     })
   .catch((err) => {
-    console.log(err);
+    console.log("Error Sending SMS: ");
+    console.error(err);
   });
 });

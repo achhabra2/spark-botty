@@ -43,7 +43,7 @@ var _matchExisting = (rooms, webhooks) => {
       };
     };
     if (!match) {
-      newWebhooks.push(rooms[j].id);
+      newWebhooks.push(rooms[i].id);
     };
   };
   return new Promise(function (resolve, reject) {
