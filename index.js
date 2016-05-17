@@ -26,7 +26,7 @@ app.post('/', function (req, res) {
     });
 });
 
-app.listen(80, function () {
+app.listen(process.env.PORT || 80, function () {
   console.log('Spark Botty Up and running on port 80');
 });
 
