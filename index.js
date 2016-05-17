@@ -53,7 +53,7 @@ botty.onText(/\/call (.+)/, (message, regArray) => {
 botty.onText(/\/text\s(\+1\d{10})\s(.+)/, (message, regArray) => {
   botty.sendSMS(regArray[1], regArray[2]).then((status) => {
     console.log(status);
-  }).then(botty.sendMessage("SMS Sent Successfully"), message.roomId)
+  }).then(botty.sendMessage(("SMS Sent Successfully"), message.roomId)
     .then((success) => {
       console.log(success);
     })
