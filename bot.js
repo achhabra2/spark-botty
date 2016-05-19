@@ -41,7 +41,7 @@ var _matchExisting = (rooms, webhooks) => {
     var match = false;
     for(j=0; j<webhooks.length; j++) {
       if (webhooks[j].filter.substring(7,webhooks[j].filter.length) == rooms[i].id) {
-        console.log("Match found at :" + webhooks[j].filter);
+        console.log("***INFO*** Match found at :" + webhooks[j].filter);
         match = true;
         break;
       };
@@ -52,11 +52,11 @@ var _matchExisting = (rooms, webhooks) => {
   };
   return new Promise(function (resolve, reject) {
     if(newWebhooks.length == 0) {
-      console.log("No new webhooks to be added. ");
+      console.log("***INFO*** No new webhooks to be added. ");
       resolve(newWebhooks);
     }
     else {
-      console.log("New webhooks to be added:" + newWebhooks);
+      console.log("***INFO*** New webhooks to be added:" + newWebhooks);
       resolve(newWebhooks);
     };
   });
@@ -83,19 +83,21 @@ var _checkWebhooks = (arrays) => {
   var deleteHooks = [];
   if (webhooks.length > 0) {
     return new Promise(function(resolve, reject) {
+      console.log("***INFO*** Checking Existing Webhooks against config URL.");
       for(i = 0; i < webhooks.length; i++) {
-        console.log("Existing Webhook: " + webhooks[i].targetUrl);
-        console.log("Config URL: " + config.webhookUrl);
+        console.log("***INFO*** Existing Webhook: " + webhooks[i].targetUrl);
+        console.log("***INFO*** Config URL: " + config.webhookUrl);
         if (webhooks[i].targetUrl != config.webhookUrl) {
           deleteHooks.push(webhooks[i].id);
           }
       }
+      console.log(deleteHooks);
       resolve(deleteHooks);
     });
   }
   else {
     return new Promise(function(resolve, reject) {
-      console.log("No conflicting webhooks found");
+      console.log("***INFO*** No conflicting webhooks found");
       resolve(deleteHooks);
     })
   };
@@ -103,8 +105,9 @@ var _checkWebhooks = (arrays) => {
 
 var _deleteHooks = (webhooks) => {
   var promises = [];
+  console.log("***DEBUG*** Executing _deleteHooks");
   for (i = 0; i < webhooks.length; i++) {
-    console.log("Deleting Webhook with ID: " + webhook[i]);
+    console.log("***INFO*** Deleting Webhook with ID: " + webhooks[i]);
     promises.push(spark.deleteWebhook(webhooks[i]));
   }
   return Promise.all(promises);
@@ -203,17 +206,19 @@ var Botty = function (params) {
 // Initialize the bot by checking existing rooms against webhooks
 // If the webhooks are not found they get added so the bot will monitor
   Botty.prototype.init = () => {
-    var query = null;
+    console.log("Welcome to Spark Botty!");
     _queryExisting()
       .then((arrays) => {
-        query = arrays;
         return _checkWebhooks(arrays);
       })
         .then((hooks) => {
-          _deleteHooks(hooks)
+          return _deleteHooks(hooks);
         })
         .then((promised) => {
-          console.log("Promise.all Yielded: " + typeof promised);
+          console.log("***DEBUG*** Promise.all Yielded: " + promised);
+          return _queryExisting();
+        })
+        .then((query) => {
           return _matchExisting(query[0].items,query[1].items);
         })
         .then((hooks) => {
@@ -227,7 +232,7 @@ var Botty = function (params) {
               .then((resp) => {
                 // Do Not have to Perform JSON.parse()
                 // We are logging the webhook ID to the console
-                console.log("Succesfully added Webhook with ID: " + resp.id);
+                console.log("***INFO*** Succesfully added Webhook with ID: " + resp.id);
               });
           });
         }
