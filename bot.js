@@ -51,11 +51,12 @@ var _matchExisting = (rooms, webhooks) => {
     };
   };
   return new Promise(function (resolve, reject) {
-    if(newWebhooks == null) {
-      reject("No new Webhooks");
+    if(newWebhooks.length == 0) {
+      console.log("No new webhooks to be added. ");
+      resolve(newWebhooks);
     }
     else {
-      console.log(newWebhooks);
+      console.log("New webhooks to be added:" + newWebhooks);
       resolve(newWebhooks);
     };
   });
@@ -64,6 +65,8 @@ var _matchExisting = (rooms, webhooks) => {
 // Method: get existing rooms and webhooks and return the combined response
 var _queryExisting = () => {
   return new Promise(function(resolve, reject) {
+    if (config.token == undefined)
+      reject("No config token defined");
     var p1 = rp(roomOptions);
     var p2 = rp(webhookOptions);
     Promise.all([p1,p2]).then((response) =>{
@@ -75,6 +78,37 @@ var _queryExisting = () => {
   })
 };
 
+var _checkWebhooks = (arrays) => {
+  var webhooks = arrays[1].items;
+  var deleteHooks = [];
+  if (webhooks.length > 0) {
+    return new Promise(function(resolve, reject) {
+      for(i = 0; i < webhooks.length; i++) {
+        console.log("Existing Webhook: " + webhooks[i].targetUrl);
+        console.log("Config URL: " + config.webhookUrl);
+        if (webhooks[i].targetUrl != config.webhookUrl) {
+          deleteHooks.push(webhooks[i].id);
+          }
+      }
+      resolve(deleteHooks);
+    });
+  }
+  else {
+    return new Promise(function(resolve, reject) {
+      console.log("No conflicting webhooks found");
+      resolve(deleteHooks);
+    })
+  };
+};
+
+var _deleteHooks = (webhooks) => {
+  var promises = [];
+  for (i = 0; i < webhooks.length; i++) {
+    console.log("Deleting Webhook with ID: " + webhook[i]);
+    promises.push(spark.deleteWebhook(webhooks[i]));
+  }
+  return Promise.all(promises);
+}
 
 /* This is our bot class that gets exported
 */
@@ -169,25 +203,36 @@ var Botty = function (params) {
 // Initialize the bot by checking existing rooms against webhooks
 // If the webhooks are not found they get added so the bot will monitor
   Botty.prototype.init = () => {
+    var query = null;
     _queryExisting()
       .then((arrays) => {
-        _matchExisting(arrays[0].items,arrays[1].items)
+        query = arrays;
+        return _checkWebhooks(arrays);
+      })
         .then((hooks) => {
-          hooks.forEach((hook) => {
-            spark.addWebhook({
-            name: 'Botty Webhook',
-            hookUrl: config.webhookUrl,
-            roomId: hook,
-          })
-        .then((resp) => {
-            // Do Not have to Perform JSON.parse()
-            // We are logging the webhook ID to the console
-            console.log("Added Webhook ID is: " + resp.id);
+          _deleteHooks(hooks)
+        })
+        .then((promised) => {
+          console.log("Promise.all Yielded: " + typeof promised);
+          return _matchExisting(query[0].items,query[1].items);
+        })
+        .then((hooks) => {
+          if(hooks.length > 0) {
+            hooks.forEach((hook) => {
+              spark.addWebhook({
+              name: 'Botty Webhook',
+              hookUrl: config.webhookUrl,
+              roomId: hook,
+            })
+              .then((resp) => {
+                // Do Not have to Perform JSON.parse()
+                // We are logging the webhook ID to the console
+                console.log("Succesfully added Webhook with ID: " + resp.id);
+              });
           });
-        });
+        }
       });
-    });
-  }
+    };
 
 };
 

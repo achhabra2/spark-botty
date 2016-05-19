@@ -22,8 +22,8 @@ app.post('/', function (req, res) {
   console.log(req.body.data.id);
   if (req.body.data.personEmail != "aman.chhabra1@gmail.com")
     botty.processMessage(req.body.data.id)
-    .then((msgId) => {
-      console.log("Succesfully processed message");
+    .then((message) => {
+      console.log("Succesfully processed message: " + message.text);
     })
     .catch((err) => {
       console.log("Error processing message:");
