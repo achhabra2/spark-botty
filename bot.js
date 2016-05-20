@@ -234,9 +234,13 @@ var Botty = function (params) {
                 // We are logging the webhook ID to the console
                 console.log("***INFO*** Succesfully added Webhook with ID: " + resp.id);
               });
-          });
-        }
-      });
+            });
+          }
+        })
+        .catch((error) => {
+          console.log("Error with Bot Initialization. ");
+          console.error(error);
+        });
     };
 
 };
