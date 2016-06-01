@@ -117,6 +117,7 @@ var _deleteHooks = (webhooks) => {
 */
 var Botty = function (params) {
   // A method of the Bot class that echoes a message back to the room
+  Object.assign(this, spark);
   this.textRegexpCallbacks = [];
 
   this.processMessage = (msgId) => {
@@ -125,7 +126,7 @@ var Botty = function (params) {
       // Get Incoming Message Text
       spark.getMessage(msgId)
         .then( (body) => {
-          _respondTo(body,responseArray);
+          return _respondTo(body,responseArray);
         })
         .then((message) => {
           resolve(message)
@@ -150,12 +151,12 @@ var Botty = function (params) {
            reg.callback(message, result);
            resolve(message);
          }
-         else reject("No Matching response type found.");
+//         else reject("No Matching response type found.");
        });
     });
   };
 
-  Botty.prototype.sendMessage = (text, roomId) => {
+  Botty.prototype.sendMsg = (text, roomId) => {
     return new Promise(function(resolve,reject) {
       spark.sendMessage({
         roomId: roomId,
