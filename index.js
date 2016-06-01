@@ -53,7 +53,7 @@ app.post('/upload', upload.single('image'), (req, res, next) => {
   botty.sendMessage({
     roomId:'Y2lzY29zcGFyazovL3VzL1JPT00vOWZiOWU1YjQtZWIyMC0zMzc3LWJiM2MtYzRjYjNmODIxYThi',
     text: 'Here is your requested image: ',
-    files: [config.webhookUrl + 'download/' + req.file.filename]
+    files: [config.webhookUrl + '/download/' + req.file.filename]
   });
 });
 
@@ -107,6 +107,5 @@ botty.onText(/\image (.+)/, (message, regArray) => {
 
   needle.post('http://98.248.114.42:4040/image', data, (err, res, body) => {
     console.log('Posted to Raspberry Pi');
-    console.log(body.room);
   });
 });
