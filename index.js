@@ -51,7 +51,7 @@ app.post('/upload', upload.single('image'), (req, res, next) => {
   console.dir(req.file);
   res.send('Thanks');
   botty.sendMessage({
-    roomId:'Y2lzY29zcGFyazovL3VzL1JPT00vOWZiOWU1YjQtZWIyMC0zMzc3LWJiM2MtYzRjYjNmODIxYThi',
+    roomId: req.body.room,
     text: 'Here is your requested image: ',
     files: [config.webhookUrl + '/download/' + req.file.filename]
   });
