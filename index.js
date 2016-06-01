@@ -53,7 +53,7 @@ app.post('/upload', upload.single('image'), (req, res, next) => {
   botty.sendMessage({
     roomId:'Y2lzY29zcGFyazovL3VzL1JPT00vOWZiOWU1YjQtZWIyMC0zMzc3LWJiM2MtYzRjYjNmODIxYThi',
     text: 'Here is your requested image: ',
-    files: ['http://166b79c3.ngrok.io/' + 'download/' + req.file.filename]
+    files: [config.webhookUrl + 'download/' + req.file.filename]
   });
 });
 
