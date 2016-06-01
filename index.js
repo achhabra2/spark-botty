@@ -47,8 +47,7 @@ app.post('/', function (req, res) {
 
 app.post('/upload', upload.single('image'), (req, res, next) => {
   console.log('Received Request');
-  console.log('Req.file: ');
-  console.dir(req.file);
+  console.log("Posting " + req.file.filename + " To RoomID: " + req.body.room);
   res.send('Thanks');
   botty.sendMessage({
     roomId: req.body.room,
