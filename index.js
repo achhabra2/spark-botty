@@ -22,8 +22,9 @@ botty.init();
 
 //Initialize Express Web Server
 var app = express();
-app.use('/', bodyParser.json());
 app.use('/download', express.static('upload'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 //Define a handler for HTTP Get on /
 app.get('/', function (req, res) {
   res.send('Hello World!');
@@ -53,6 +54,19 @@ app.post('/upload', upload.single('image'), (req, res, next) => {
     roomId: req.body.room,
     text: 'Here is your requested image: ',
     files: [config.webhookUrl + '/download/' + req.file.filename]
+  });
+});
+
+app.post('/command', (req, res) => {
+  console.log('Received Command Update');
+  res.send('Thanks');
+  botty.sendMessage({
+    roomId: req.body.room,
+    text: req.body.text
+  })
+  .catch((err) => {
+    console.log('Error Caught: ');
+    console.log(err);
   });
 });
 
@@ -97,7 +111,7 @@ botty.onText(/\/text\s(\+1\d{10})\s(.+)/, (message, regArray) => {
   });
 });
 
-botty.onText(/\image (.+)/, (message, regArray) => {
+botty.onText(/\/pi picture/, (message, regArray) => {
   var data = {
     room: message.roomId,
     type: 'image',
@@ -105,6 +119,19 @@ botty.onText(/\image (.+)/, (message, regArray) => {
   }
 
   needle.post('http://98.248.114.42:4040/image', data, (err, res, body) => {
-    console.log('Posted to Raspberry Pi');
+    console.log('Posted to Raspberry Pi Image');
+  });
+});
+
+botty.onText(/\/pi video/, (message, regArray) => {
+  var data = {
+    room: message.roomId,
+    type: 'video',
+    timeout: '60',
+    uploadurl: config.webhookUrl + '/command'
+  }
+
+  needle.post('http://98.248.114.42:4040/video', data, (err, res, body) => {
+    console.log('Posted to Raspberry Pi Video');
   });
 });
