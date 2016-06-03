@@ -44,7 +44,8 @@ if(config.productionMode) {
   // HTTPS
   var secureServer = https.createServer({
       key: fs.readFileSync('keys/ec2_teamwmc_com.key'),
-      cert: fs.readFileSync('keys/ec2_teamwmc_com.crt')
+      cert: fs.readFileSync('keys/ec2_teamwmc_com.crt'),
+      ca: fs.readFileSync('keys/ca.bundle')
     }, app)
     .listen(HTTPS_PORT, function () {
       console.log('Secure Server listening on port ' + HTTPS_PORT);
