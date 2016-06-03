@@ -1,9 +1,12 @@
-var express = require('express');
-var bodyParser = require('body-parser');
-var bot = require('./bot');
-var multer = require('multer');
-var config = require('./config');
-var needle = require('needle');
+var express = require('express'),
+    bodyParser = require('body-parser'),
+    bot = require('./bot'),
+    multer = require('multer'),
+    config = require('./config'),
+    needle = require('needle'),
+    https = require('https'),
+    http = require('http'),
+    fs = require('fs');
 
 var storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -26,6 +29,38 @@ app.use('/download', express.static('upload'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 //Define a handler for HTTP Get on /
+
+if(config.productionMode) {
+  // If we are in production use HTTPS instead of HTTP
+  var HTTP_PORT = config.port;
+  var HTTPS_PORT = config.securePort;
+  app.all('*', function(req, res, next){
+  if (req.secure) {
+    return next();
+  };
+  res.redirect('https://localhost:'+HTTPS_PORT+req.url);
+  // res.redirect('https://'+req.hostname+':'+HTTPS_PORT+req.url);
+  });
+  // HTTPS
+  var secureServer = https.createServer({
+      key: fs.readFileSync('keys/ec2_teamwmc_com.key'),
+      cert: fs.readFileSync('keys/ec2_teamwmc_com.crt')
+    }, app)
+    .listen(HTTPS_PORT, function () {
+      console.log('Secure Server listening on port ' + HTTPS_PORT);
+  });
+
+  var insecureServer = http.createServer(app).listen(HTTP_PORT, function() {
+    console.log('Insecure Server listening on port ' + HTTP_PORT);
+  })
+}
+else {
+  // Start listening on port 80 or the port defined in environment variables
+  app.listen(config.port || 80, function () {
+    console.log('Spark Botty Up and running on port 80');
+  });
+};
+
 app.get('/', function (req, res) {
   res.send('Hello World!');
 });
@@ -69,12 +104,6 @@ app.post('/command', (req, res) => {
     console.log(err);
   });
 });
-
-// Start listening on port 80 or the port defined in environment variables
-app.listen(process.env.PORT || 80, function () {
-  console.log('Spark Botty Up and running on port 80');
-});
-
 
 // Define BOT handler method for /echo *text*
 botty.onText(/\/echo (.+)/, (message, regArray) => {
