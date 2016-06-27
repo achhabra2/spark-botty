@@ -30,7 +30,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 //Define a handler for HTTP Get on /
 
-if(config.productionMode) {
+if(config.productionMode == 'True') {
   // If we are in production use HTTPS instead of HTTP
   var HTTP_PORT = config.port;
   var HTTPS_PORT = config.securePort;
@@ -58,7 +58,7 @@ if(config.productionMode) {
 else {
   // Start listening on port 80 or the port defined in environment variables
   app.listen(config.port || 80, function () {
-    console.log('Spark Botty Up and running on port 80');
+    console.log('Spark Botty Up and running on port ' + config.port);
   });
 };
 
